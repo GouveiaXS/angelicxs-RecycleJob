@@ -73,7 +73,8 @@ CreateThread(function()
     elseif Config.UseQBCore then
         QBCore = exports['qb-core']:GetCoreObject()
     end
-    if Config.UseThirdEye then
+    if Config.UseThirdEye and Config.ThirdEyeName ~= 'ox_target' then
+        
         local op = {
             entry = {
                 label = Config.Lang['request_entry'],
@@ -88,54 +89,30 @@ CreateThread(function()
                 event = 'angelicxs-RecylceJob:OnDuty',
             },
         }
-        if Config.ThirdEyeName == 'ox_target' then
-            exports.ox_target:addBoxZone({
-                coords = vector3(Config.EntryPoint.x, Config.EntryPoint.y, Config.EntryPoint.z),
-                size = vector3(2,2,2),
-                rotation = Config.EntryPoint.w,
-                debug = false,
-                options = op.entry,
-            })
-            exports.ox_target:addBoxZone({
-                coords = vector3(warehouselocation.x, warehouselocation.y, warehouselocation.z),
-                size = vector3(2,2,2),
-                rotation = warehouselocation.w,
-                debug = false,
-                options = op.exit,
-            })
-            exports.ox_target:addBoxZone({
-                coords = vector3(dutySpot.x, dutySpot.y, dutySpot.z),
-                size = vector3(2,2,2),
-                rotation = 0.0,
-                debug = false,
-                options = op.duty,
-            })
-        else
-            exports[Config.ThirdEyeName]:AddBoxZone("RecyleEntry", vector3(Config.EntryPoint.x, Config.EntryPoint.y, Config.EntryPoint.z), 2.0, 2.0, {
-                name = "RecyleEntry",
-                heading = Config.EntryPoint.w,
-                debugPoly = false,
-                minZ = Config.EntryPoint.z-1,
-                maxZ = Config.EntryPoint.z+1,
-                },{ options = {op.entry}, distance = 2.5
-            })
-            exports[Config.ThirdEyeName]:AddBoxZone("RecyleExit", vector3(warehouselocation.x, warehouselocation.y, warehouselocation.z), 2.0, 2.0, {
-                name = "RecyleExit",
-                heading = warehouselocation.w,
-                debugPoly = false,
-                minZ = warehouselocation.z-1,
-                maxZ = warehouselocation.z+1,
-                },{ options = {op.exit}, distance = 2.5
-            })
-            exports[Config.ThirdEyeName]:AddBoxZone("RecyleDuty", vector3(dutySpot.x, dutySpot.y, dutySpot.z), 2.0, 2.0, {
-                name = "RecyleDuty",
-                heading = 0.0,
-                debugPoly = false,
-                minZ = dutySpot.z-1,
-                maxZ = dutySpot.z+1,
-                },{ options = {op.duty}, distance = 2.5
-            })
-        end
+        exports[Config.ThirdEyeName]:AddBoxZone("RecyleEntry", vector3(Config.EntryPoint.x, Config.EntryPoint.y, Config.EntryPoint.z), 2.0, 2.0, {
+            name = "RecyleEntry",
+            heading = Config.EntryPoint.w,
+            debugPoly = false,
+            minZ = Config.EntryPoint.z-1,
+            maxZ = Config.EntryPoint.z+1,
+            },{ options = {op.entry}, distance = 2.5
+        })
+        exports[Config.ThirdEyeName]:AddBoxZone("RecyleExit", vector3(warehouselocation.x, warehouselocation.y, warehouselocation.z), 2.0, 2.0, {
+            name = "RecyleExit",
+            heading = warehouselocation.w,
+            debugPoly = false,
+            minZ = warehouselocation.z-1,
+            maxZ = warehouselocation.z+1,
+            },{ options = {op.exit}, distance = 2.5
+        })
+        exports[Config.ThirdEyeName]:AddBoxZone("RecyleDuty", vector3(dutySpot.x, dutySpot.y, dutySpot.z), 2.0, 2.0, {
+            name = "RecyleDuty",
+            heading = 0.0,
+            debugPoly = false,
+            minZ = dutySpot.z-1,
+            maxZ = dutySpot.z+1,
+            },{ options = {op.duty}, distance = 2.5
+        })
     end
     CreateThread(function()
         while true do 
@@ -149,6 +126,12 @@ CreateThread(function()
                 SetBlockingOfNonTemporaryEvents(EntryPed, true)
                 TaskStartScenarioInPlace(EntryPed,'WORLD_HUMAN_STAND_IMPATIENT', 0, false)
                 SetModelAsNoLongerNeeded(Config.EntryPed)
+                if Config.ThirdEyeName == 'ox_target' and Config.UseThirdEye then
+                    exports.ox_target:addLocalEntity(EntryPed, {{
+                        label = Config.Lang['request_entry'],
+                        event = 'angelicxs-RecylceJob:Entry',
+                    }})
+                end
             elseif dist > 50 and pedStatus then
                 DeleteEntity(EntryPed)
                 EntryPed = nil
@@ -256,14 +239,24 @@ RegisterNetEvent('angelicxs-RecylceJob:Entry', function()
     SetBlockingOfNonTemporaryEvents(ExitPed, true)
     TaskStartScenarioInPlace(ExitPed,'WORLD_HUMAN_STAND_IMPATIENT', 0, false)
     SetModelAsNoLongerNeeded(Config.ExitPed)
+    if Config.ThirdEyeName == 'ox_target' and Config.UseThirdEye then
+        exports.ox_target:addLocalEntity(ExitPed, {{
+            label = Config.Lang['request_exit'],
+            event ='angelicxs-RecylceJob:Exit',
+        }})
+    end
     DutyPed = CreatePed(3, HashGrabber(Config.DutyPed), dutySpot.x, dutySpot.y, (dutySpot.z-1), dutySpot.w, false, false)
     FreezeEntityPosition(DutyPed, true)
     SetEntityInvincible(DutyPed, true)
     SetBlockingOfNonTemporaryEvents(DutyPed, true)
     TaskStartScenarioInPlace(DutyPed,'WORLD_HUMAN_CLIPBOARD', 0, false)
     SetModelAsNoLongerNeeded(Config.DutyPed)
-
-
+    if Config.ThirdEyeName == 'ox_target' and Config.UseThirdEye then
+        exports.ox_target:addLocalEntity(DutyPed, {{
+            label = Config.Lang['sign_in'],
+            event = 'angelicxs-RecylceJob:OnDuty',
+        }})
+    end
 
     if Config.UseThirdEye then
         if Config.ThirdEyeName == 'ox_target' then
