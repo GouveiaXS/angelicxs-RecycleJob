@@ -25,10 +25,10 @@ local targetbinlabel = {
     green = Config.Lang['place_item']..Config.Lang['green']..Config.Lang['sort_item_2'],
 }
 local OXoptions = {
-    yellow = { label = targetbinlabel.yellow, onSelect = function() SortItem('yellow') end, distance = 2, },
-    blue = { label = targetbinlabel.blue, onSelect = function() SortItem('blue') end, distance = 2, },
-    green = { label = targetbinlabel.green, onSelect = function() SortItem('green') end, distance = 2, },
-    trash = { label = Config.Lang['grab_sort_item'], distance = 2, 
+    yellow = { name = 'YellowSort', label = targetbinlabel.yellow, onSelect = function() SortItem('yellow') end, distance = 2, },
+    blue = { name = 'BlueSort', label = targetbinlabel.blue, onSelect = function() SortItem('blue') end, distance = 2, },
+    green = { name = 'GreenSort', label = targetbinlabel.green, onSelect = function() SortItem('green') end, distance = 2, },
+    trash = { name = 'TrashSort', label = Config.Lang['grab_sort_item'], distance = 2, 
         onSelect = function()
             if not OnDuty then
                 TriggerEvent('angelicxs-RecylceJob:Notify', Config.Lang['not_on_duty'], Config.LangType['info'])
@@ -210,10 +210,10 @@ RegisterNetEvent('angelicxs-RecylceJob:Exit', function()
     while not IsScreenFadedIn() do Wait(10) end
     if Config.UseThirdEye then
         if Config.ThirdEyeName == 'ox_target' then
-            exports.ox_target:removeModel(-14708062, OXoptions.yellow)
-            exports.ox_target:removeModel(-96647174, OXoptions.blue)
-            exports.ox_target:removeModel(811169045, OXoptions.green)
-            exports.ox_target:removeModel(1748268526, OXoptions.trash)
+            exports.ox_target:removeModel(-14708062, OXoptions.yellow.name)
+            exports.ox_target:removeModel(-96647174, OXoptions.blue.name)
+            exports.ox_target:removeModel(811169045, OXoptions.green.name)
+            exports.ox_target:removeModel(1748268526, OXoptions.trash.name)
         else
             exports[Config.ThirdEyeName]:RemoveTargetModel(-14708062, TargetOptions.yellow.label)
             exports[Config.ThirdEyeName]:RemoveTargetModel(-96647174, TargetOptions.blue.label)
@@ -495,10 +495,10 @@ AddEventHandler('onResourceStop', function(resource)
         end
         if Config.UseThirdEye then
             if Config.ThirdEyeName == 'ox_target' then
-                exports.ox_target:removeModel(-14708062, OXoptions.yellow)
-                exports.ox_target:removeModel(-96647174, OXoptions.blue)
-                exports.ox_target:removeModel(811169045, OXoptions.green)
-                exports.ox_target:removeModel(1748268526, OXoptions.trash)
+                exports.ox_target:removeModel(-14708062, OXoptions.yellow.name)
+                exports.ox_target:removeModel(-96647174, OXoptions.blue.name)
+                exports.ox_target:removeModel(811169045, OXoptions.green.name)
+                exports.ox_target:removeModel(1748268526, OXoptions.trash.name)
             else
                 exports[Config.ThirdEyeName]:RemoveTargetModel(-14708062, TargetOptions.yellow.label)
                 exports[Config.ThirdEyeName]:RemoveTargetModel(-96647174, TargetOptions.blue.label)
